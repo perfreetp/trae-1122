@@ -34,9 +34,11 @@ interface AppState {
   updateAlarmStatus: (alarmId: string, status: Alarm['status'], handlerName?: string) => void;
   dispatchAlarm: (alarmId: string, handlerName: string) => void;
   resolveAlarm: (alarmId: string, note: string) => void;
-  completeInspectionPoint: (taskId: string, pointId: string, remark?: string, abnormal?: boolean) => void;
+  completeInspectionPoint: (taskId: string, pointId: string, remark?: string, abnormal?: boolean, photos?: string[]) => void;
   addChangeOrder: (order: Omit<ChangeOrder, 'id' | 'createdAt'>) => void;
   approveChangeOrder: (orderId: string, opinion: string, approve: boolean) => void;
+  addDevice: (device: Omit<Device, 'id'>) => void;
+  addInspectionTask: (task: Omit<InspectionTask, 'id' | 'createdAt' | 'completedCount' | 'status'>) => void;
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -121,7 +123,7 @@ export const useStore = create<AppState>((set) => ({
       ),
     })),
     
-  completeInspectionPoint: (taskId, pointId, remark, abnormal) =>
+  completeInspectionPoint: (taskId, pointId, remark, abnormal, photos) =>
     set((state) => ({
       inspectionTasks: state.inspectionTasks.map((task) => {
         if (task.id !== taskId) return task;
@@ -133,6 +135,7 @@ export const useStore = create<AppState>((set) => ({
                 checkTime: new Date().toISOString(),
                 remark: remark || p.remark,
                 abnormal: abnormal ?? p.abnormal,
+                photos: photos || p.photos,
               }
             : p
         );
@@ -171,5 +174,30 @@ export const useStore = create<AppState>((set) => ({
             }
           : o
       ),
+    })),
+    
+  addDevice: (device) =>
+    set((state) => ({
+      devices: [
+        {
+          ...device,
+          id: `dev${String(state.devices.length + 1).padStart(5, '0')}`,
+        },
+        ...state.devices,
+      ],
+    })),
+    
+  addInspectionTask: (task) =>
+    set((state) => ({
+      inspectionTasks: [
+        {
+          ...task,
+          id: `task${String(state.inspectionTasks.length + 1).padStart(5, '0')}`,
+          createdAt: new Date().toISOString(),
+          completedCount: 0,
+          status: 'pending',
+        },
+        ...state.inspectionTasks,
+      ],
     })),
 }));

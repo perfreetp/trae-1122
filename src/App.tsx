@@ -1,13 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "@/pages/Home";
+import { RouterProvider } from 'react-router-dom';
+import { router } from './router';
 
 export default function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/other" element={<div className="text-center text-xl">Other Page - Coming Soon</div>} />
-      </Routes>
-    </Router>
-  );
+  return <RouterProvider router={router} />;
 }
